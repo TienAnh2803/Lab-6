@@ -2,6 +2,7 @@ using System.Collections;
 using System.Collections.Generic;
 using UnityEditor.UIElements;
 using UnityEngine;
+using UnityEngine.SceneManagement;
 
 public class PlayerController : MonoBehaviour
 {
@@ -21,8 +22,8 @@ public class PlayerController : MonoBehaviour
     }
     public void HandleUpdate()
     {
-        if(!isMoving)
-        {   
+        if (!isMoving)
+        {
             input.x = Input.GetAxisRaw("Horizontal");
             input.y = Input.GetAxisRaw("Vertical");
 
@@ -30,7 +31,7 @@ public class PlayerController : MonoBehaviour
             Debug.Log("This is input.y" + input.y);
 
             if (input.x != 0) input.y = 0;
-            if(input != Vector2.zero )
+            if (input != Vector2.zero)
             {
                 animator.SetFloat("moveX", input.x);
                 animator.SetFloat("moveY", input.y);
@@ -38,8 +39,8 @@ public class PlayerController : MonoBehaviour
                 var targetPos = transform.position;
                 targetPos.x += input.x;
                 targetPos.y += input.y;
-                if(IsWalkable(targetPos)) 
-                StartCoroutine(Move(targetPos));
+                if (IsWalkable(targetPos))
+                    StartCoroutine(Move(targetPos));
             }
         }
         animator.SetBool("isMoving", isMoving);
@@ -47,7 +48,7 @@ public class PlayerController : MonoBehaviour
         if (Input.GetKeyDown(KeyCode.Z))
             Interact();
 
-       
+
     }
     void Interact()
     {
@@ -66,8 +67,8 @@ public class PlayerController : MonoBehaviour
         isMoving = true;
         while ((targetPos - transform.position).sqrMagnitude > Mathf.Epsilon)
         {
-           transform.position = Vector3.MoveTowards(transform.position, targetPos, moveSpeed + Time.deltaTime);
-           yield return null;
+            transform.position = Vector3.MoveTowards(transform.position, targetPos, moveSpeed + Time.deltaTime);
+            yield return null;
         }
         transform.position = targetPos;
 
@@ -77,15 +78,15 @@ public class PlayerController : MonoBehaviour
     }
     private bool IsWalkable(Vector3 targetPos)
     {
-        if(Physics2D.OverlapCircle(targetPos, 0.2f, solidObjectsLayer | interactablesLayer) != null) 
-        { 
+        if (Physics2D.OverlapCircle(targetPos, 0.2f, solidObjectsLayer | interactablesLayer) != null)
+        {
             return false;
         }
         return true;
     }
     private void CheckForEncounters()
     {
-        if(Physics2D.OverlapCircle(transform.position, 0.01f, battleLayer) != null)
+        if (Physics2D.OverlapCircle(transform.position, 0.01f, battleLayer) != null)
         {
             if (Random.Range(1, 100) <= 50)
             {
@@ -93,7 +94,6 @@ public class PlayerController : MonoBehaviour
             }
         }
     }
-
     private void OnTriggerEnter2D(Collider2D collision)
     {
         if (collision.gameObject.tag == "gun")
@@ -102,8 +102,6 @@ public class PlayerController : MonoBehaviour
             {
                 Gun.GetComponent<GunController>().canFire = true;
             }
-                
-
         }
     }
 }
